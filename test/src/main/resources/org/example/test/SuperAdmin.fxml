@@ -24,7 +24,7 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Label>
-            <Button alignment="CENTER" layoutX="99.0" layoutY="146.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="65.0" style="-fx-background-color: transparent;">
+            <Button alignment="CENTER" layoutX="35.0" layoutY="146.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="65.0" style="-fx-background-color: transparent;">
                <graphic>
                   <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -33,7 +33,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button layoutX="185.0" layoutY="146.0" mnemonicParsing="false" style="-fx-background-color: transparent;">
+            <Button layoutX="135.0" layoutY="146.0" mnemonicParsing="false" onAction="#removeUser" style="-fx-background-color: transparent;">
                <graphic>
                   <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -42,7 +42,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button layoutX="271.0" layoutY="146.0" mnemonicParsing="false" style="-fx-background-color: transparent;">
+            <Button layoutX="235.0" layoutY="146.0" mnemonicParsing="false" style="-fx-background-color: transparent;">
                <graphic>
                   <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -57,8 +57,8 @@
                 <TableColumn fx:id="colPrenumeSA" text="Prenume" />
                   <TableColumn fx:id="colEmailSA" prefWidth="110.66667175292969" text="Email" />
                   <TableColumn fx:id="colAdresaSA" prefWidth="81.99993896484375" text="Adresa" />
-                  <TableColumn fx:id="colNrTelSA" prefWidth="104.0" text="NumarTelefon" />
-                  <TableColumn fx:id="colCNPSA" prefWidth="187.99996948242188" text="CNP" />
+                  <TableColumn fx:id="colNrTelSA" prefWidth="93.3333740234375" text="NumarTelefon" />
+                  <TableColumn fx:id="colCNPSA" prefWidth="89.33331298828125" text="CNP" />
                   <TableColumn fx:id="colIBANSA" prefWidth="132.66668701171875" text="IBAN" />
                   <TableColumn fx:id="colFunctieSA" prefWidth="153.3333740234375" text="Functie" />
               </columns>

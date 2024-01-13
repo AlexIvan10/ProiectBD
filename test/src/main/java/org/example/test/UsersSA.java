@@ -5,22 +5,21 @@ public class UsersSA {
     private String prenume;
     private String email;
     private String adresa;
-    private String nrTel;
+    private String numarTelefon;
     private String CNP;
     private String IBAN;
+    private String functie;
 
-    public UsersSA(String nume, String prenume, String email, String adresa, String nrTel, String CNP, String IBAN, String functie) {
+    public UsersSA(String nume, String prenume, String email, String adresa, String numarTelefon, String CNP, String IBAN, String functie) {
         this.nume = nume;
         this.prenume = prenume;
         this.email = email;
         this.adresa = adresa;
-        this.nrTel = nrTel;
+        this.numarTelefon = numarTelefon;
         this.CNP = CNP;
         this.IBAN = IBAN;
         this.functie = functie;
     }
-
-    private String functie;
 
     public String getNume() {
         return nume;
@@ -54,12 +53,12 @@ public class UsersSA {
         this.adresa = adresa;
     }
 
-    public String getNrTel() {
-        return nrTel;
+    public String getNumarTelefon() {
+        return numarTelefon;
     }
 
-    public void setNrTel(String nrTel) {
-        this.nrTel = nrTel;
+    public void setNumarTelefon(String nrTel) {
+        this.numarTelefon = nrTel;
     }
 
     public String getCNP() {

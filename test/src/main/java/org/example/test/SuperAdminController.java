@@ -1,5 +1,9 @@
 package org.example.test;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,12 +13,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import javax.swing.*;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
 public class SuperAdminController implements Initializable{
-     @FXML
+    @FXML
     private TableView<UsersSA> TableSuperAdmin;
 
     @FXML
@@ -98,6 +103,9 @@ public class SuperAdminController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        updateTable();
+    }
+    public void updateTable(){
         colNumeSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("Nume"));
         colPrenumeSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("Prenume"));
         colEmailSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("Email"));
@@ -108,5 +116,66 @@ public class SuperAdminController implements Initializable{
         colFunctieSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("Functie"));
         getUsers();
         TableSuperAdmin.setItems(list);
+    }
+    public void removeUser(ActionEvent e){
+        Connection connection;
+        PreparedStatement preparedStatement = null;
+        Statement statement = null;
+        String userToDelete = "DELETE FROM Utilizatori WHERE ID_Utilizator = ?";
+        String verifyPolyclinicID = "SELECT * FROM Utilizatori WHERE Email = ?";
+        String verifySuperAdminPolyclinicID = "SELECT * FROM Utilizatori WHERE Email = '" + UserData.getEmail() + "'";
+
+        DatabaseConnection connectNow = new DatabaseConnection();
+        connection = connectNow.getConnection();
+
+        try{
+            TableView.TableViewSelectionModel<UsersSA> selectedID = TableSuperAdmin.getSelectionModel();
+            UsersSA selectedUser = selectedID.getSelectedItem();
+            if(selectedUser.getFunctie().equals("Super Admin")){
+                FXMLLoader fxmlLoader = new FXMLLoader(SuperAdminController.class.getResource("DeleteSuperAdminError.fxml"));
+                Scene scene = new Scene(fxmlLoader.load(), 400, 320);
+                Stage stageESA = new Stage();
+                stageESA.setScene(scene);
+                stageESA.show();
+            }
+            else{
+                ResultSet resultSet;
+                int userPolyclinicID;
+                int userID;
+                int superAdminPolyclinicID = 0;
+                statement = connection.createStatement();
+                statement.execute(verifySuperAdminPolyclinicID);
+                resultSet = statement.executeQuery(verifySuperAdminPolyclinicID);
+                while(resultSet.next()){
+                    superAdminPolyclinicID = resultSet.getInt("ID_Policlinici");
+                }
+
+                preparedStatement = connection.prepareStatement(verifyPolyclinicID);
+                preparedStatement.setString(1, selectedUser.getEmail());
+                resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    userPolyclinicID = resultSet.getInt("ID_Policlinici");
+                    userID = resultSet.getInt("ID_Utilizator");
+                    if(superAdminPolyclinicID == userPolyclinicID){
+                        TableSuperAdmin.getItems().remove(selectedID.getSelectedIndex());
+                        preparedStatement = connection.prepareStatement(userToDelete);
+                        preparedStatement.setInt(1, userID);
+                        preparedStatement.execute();
+                        updateTable();
+                    }
+                    else{
+                        FXMLLoader fxmlLoader = new FXMLLoader(SuperAdminController.class.getResource("DifferentPolyclinic.fxml"));
+                        Scene scene = new Scene(fxmlLoader.load(), 400, 320);
+                        Stage stageEDP = new Stage();
+                        stageEDP.setScene(scene);
+                        stageEDP.show();
+                    }
+                }
+            }
+
+        }catch (Exception ex){
+            System.err.println("An SQL Exception occured. Details are provided below:");
+            ex.printStackTrace(System.err);
+        }
     }
 }
