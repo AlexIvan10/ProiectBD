@@ -20,6 +20,76 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Label>
+            <Label layoutX="123.0" layoutY="144.0" text="Nume" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="106.0" layoutY="198.0" text="Prenume" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="60.0" layoutY="258.0" text="Data Programare" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="66.0" layoutY="314.0" text="Ora Programare" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="112.0" layoutY="369.0" text="Serviciu" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="133.0" layoutY="424.0" text="Pret" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="118.0" layoutY="473.0" text="Durata" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="numePacientFld" layoutX="368.0" layoutY="144.0" prefHeight="35.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="prenumePacientFld" layoutX="368.0" layoutY="198.0" prefHeight="35.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="dataProgramarePacientFld" layoutX="368.0" layoutY="258.0" prefHeight="35.0" prefWidth="440.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="oraProgramarePacientFld" layoutX="368.0" layoutY="314.0" prefHeight="35.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="serviciuPacientFld" layoutX="368.0" layoutY="369.0" prefHeight="35.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="pretPacientFld" layoutX="368.0" layoutY="424.0" prefHeight="35.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="durataPacientFld" layoutX="368.0" layoutY="473.0" prefHeight="35.0" prefWidth="220.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </center>

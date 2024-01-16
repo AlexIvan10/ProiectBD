@@ -13,7 +13,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import javax.swing.*;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
@@ -46,7 +45,14 @@ public class SuperAdminController implements Initializable{
     @FXML
     private TableColumn<UsersSA, String> colPrenumeSA;
 
+    @FXML
+    private TableColumn<UsersSA, String> colPoliclinicaSA;
+
+    @FXML
+    private Label errorMessage;
+
     ObservableList<UsersSA> list;
+
     @FXML
     protected void logOutButtonAction(ActionEvent e){
         HelloController.logOutButtonAction(e, SuperAdminController.class);
@@ -54,49 +60,35 @@ public class SuperAdminController implements Initializable{
     public void getUsers(){
         Connection connection = null;
         Statement selectStatement = null;
-        ResultSet rs = null;
+        ResultSet resultSet = null;
         ObservableList<UsersSA> tempList = FXCollections.observableArrayList();
-
-        String getAllData  = "SELECT * FROM Utilizatori";
 
         DatabaseConnection connectNow = new DatabaseConnection();
         connection = connectNow.getConnection();
 
         try{
+            int superAdminID = 0;
+            String getSuperAdminPolyclinicID = "SELECT ID_Policlinici FROM Utilizatori WHERE Email = '" + UserData.getEmail() + "'";
             selectStatement = connection.createStatement();
-            selectStatement.execute(getAllData);
-            rs = selectStatement.executeQuery(getAllData);
+            resultSet = selectStatement.executeQuery(getSuperAdminPolyclinicID);
+            while(resultSet.next()){
+                superAdminID = resultSet.getInt("ID_Policlinici");
+            }
 
-            while(rs.next()){
-                tempList.add(new UsersSA(rs.getString("Nume"), rs.getString("Prenume"), rs.getString("Email"), rs.getString("Adresa"), rs.getString("NumarTelefon"), rs.getString("CNP"), rs.getString("ContIBAN"), rs.getString("Functie")));
+            String getAllData  = "SELECT * FROM utilizatori, policlinici WHERE policlinici.ID_Policlinici = utilizatori.ID_Policlinici AND utilizatori.ID_Policlinici = " + superAdminID;
+            resultSet = selectStatement.executeQuery(getAllData);
+
+            while(resultSet.next()){
+                tempList.add(new UsersSA(resultSet.getString("Nume"), resultSet.getString("Prenume"), resultSet.getString("Email"), resultSet.getString("Adresa"), resultSet.getString("NumarTelefon"), resultSet.getString("CNP"), resultSet.getString("ContIBAN"), resultSet.getString("Functie"), resultSet.getString("NumePoliclinica")));
             }
         }catch (Exception sqlex){
             System.err.println("An SQL Exception occured. Details are provided below:");
             sqlex.printStackTrace(System.err);
         }
         finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                }
-                catch(SQLException ex) {
-                }
-                rs = null;
-            }
-            if (selectStatement != null) {
-                try {
-                    selectStatement.close();
-                }
-                catch(SQLException ex) {}
-                selectStatement = null;
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                }
-                catch(SQLException ex) {}
-                connection = null;
-            }
+            closeOperation(connection);
+            closeOperation(selectStatement);
+            closeOperation(resultSet);
         }
         list = tempList;
     }
@@ -114,13 +106,28 @@ public class SuperAdminController implements Initializable{
         colCNPSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("CNP"));
         colIBANSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("IBAN"));
         colFunctieSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("Functie"));
+        colPoliclinicaSA.setCellValueFactory(new PropertyValueFactory<UsersSA, String>("Policlinica"));
         getUsers();
         TableSuperAdmin.setItems(list);
+    }
+    public void addUser(ActionEvent e){
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(SuperAdminController.class.getResource("SelectUserTypeSuperAdmin.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Stage stageASA = new Stage();
+            stageASA.setScene(scene);
+            stageASA.show();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
     public void removeUser(ActionEvent e){
         Connection connection;
         PreparedStatement preparedStatement = null;
         Statement statement = null;
+        ResultSet resultSet = null;
+        CallableStatement callableStatement = null;
+        String userToDeletePacient = "DELETE FROM Pacienti WHERE ID_Utilizator = ?";
         String userToDelete = "DELETE FROM Utilizatori WHERE ID_Utilizator = ?";
         String verifyPolyclinicID = "SELECT * FROM Utilizatori WHERE Email = ?";
         String verifySuperAdminPolyclinicID = "SELECT * FROM Utilizatori WHERE Email = '" + UserData.getEmail() + "'";
@@ -131,51 +138,205 @@ public class SuperAdminController implements Initializable{
         try{
             TableView.TableViewSelectionModel<UsersSA> selectedID = TableSuperAdmin.getSelectionModel();
             UsersSA selectedUser = selectedID.getSelectedItem();
-            if(selectedUser.getFunctie().equals("Super Admin")){
-                FXMLLoader fxmlLoader = new FXMLLoader(SuperAdminController.class.getResource("DeleteSuperAdminError.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 400, 320);
-                Stage stageESA = new Stage();
-                stageESA.setScene(scene);
-                stageESA.show();
+            if(selectedUser != null){
+                if(selectedUser.getFunctie().equals("Super Admin")){
+                    errorMessage.setText("Nu poti sterge un Super Admin");
+                }
+                else{
+
+                }
+                if(selectedUser.getFunctie().equals("Pacient")){
+                    int pacientID = 0;
+                    int utilizatorID = 0;
+                    String getPacientID = "SELECT Pacienti.ID_Pacient, Pacienti.ID_Utilizator " +
+                                          "FROM Utilizatori, Pacienti " +
+                                          "WHERE Utilizatori.ID_Utilizator = Pacienti.ID_Utilizator AND Utilizatori.Email = '" + selectedUser.getEmail() + "'";
+                    statement = connection.createStatement();
+                    resultSet = statement.executeQuery(getPacientID);
+                    while(resultSet.next()){
+                        utilizatorID = resultSet.getInt("ID_Utilizator");
+                        pacientID = resultSet.getInt("ID_Pacient");
+                    }
+                    String deleteBon = "DELETE FROM bonurifiscale WHERE ID_Pacient = " + pacientID;
+                    String deleteServicii = "DELETE FROM serviciimedicalerealizate WHERE ID_Pacient = " + pacientID;
+                    String deleteRapoarte = "DELETE FROM rapoartemedicale WHERE ID_Pacient = " + pacientID;
+                    String deleteProgramare = "DELETE FROM programarepacienti WHERE ID_Pacient = " + pacientID;
+                    String deletePacient = "DELETE FROM Pacienti WHERE ID_Utilizator = " + utilizatorID;
+                    String deleteSange = "DELETE FROM DonatoriSange WHERE ID_Utilizator = " + utilizatorID;
+                    String deleteUtilizator = "DELETE FROM Utilizatori WHERE ID_Utilizator = " + utilizatorID;
+                    statement.execute(deleteBon);
+                    statement.execute(deleteServicii);
+                    statement.execute(deleteRapoarte);
+                    statement.execute(deleteProgramare);
+                    statement.execute(deletePacient);
+                    statement.execute(deleteSange);
+                    statement.execute(deleteUtilizator);
+                    TableSuperAdmin.getItems().remove(selectedID.getSelectedIndex());
+                } else if(selectedUser.getFunctie().equals("Medic")){
+                    int utilizatorID = 0;
+                    int angajatID = 0;
+                    int medicID = 0;
+                    int polyclinicID = 0;
+                    int nrMedici = 0;
+                    int newMedic = 0;
+                    String getMedicID = "SELECT Utilizatori.ID_Policlinici, Utilizatori.id_utilizator, angajat.id_angajat, medic.ID_Medic FROM utilizatori, angajat, medic WHERE utilizatori.id_utilizator = angajat.id_utilizator AND angajat.id_angajat = medic.id_angajat AND utilizatori.email = '" + selectedUser.getEmail() + "'";
+                    statement = connection.createStatement();
+                    resultSet = statement.executeQuery(getMedicID);
+                    while(resultSet.next()){
+                        polyclinicID = resultSet.getInt("ID_Policlinici");
+                        utilizatorID = resultSet.getInt("ID_Utilizator");
+                        angajatID = resultSet.getInt("ID_Angajat");
+                        medicID = resultSet.getInt("ID_Medic");
+                    }
+                    String getNumberOfMedici = "SELECT COUNT(*) AS NrMedici FROM utilizatori, angajat, medic WHERE utilizatori.id_utilizator = angajat.id_utilizator AND angajat.id_angajat = medic.id_angajat AND utilizatori.id_policlinici = " + polyclinicID;
+                    String getNewMedicId = "SELECT Utilizatori.ID_Policlinici, Utilizatori.id_utilizator, angajat.id_angajat, medic.ID_Medic FROM utilizatori, angajat, medic WHERE utilizatori.id_utilizator = angajat.id_utilizator AND angajat.id_angajat = medic.id_angajat AND utilizatori.id_policlinici = " + polyclinicID;
+                    resultSet = statement.executeQuery(getNumberOfMedici);
+                    while(resultSet.next()){
+                        nrMedici = resultSet.getInt("NrMedici");
+                    }
+                    resultSet = statement.executeQuery(getNewMedicId);
+                    while(resultSet.next()){
+                        if(resultSet.getInt("ID_Medic") != medicID)
+                            newMedic = resultSet.getInt("ID_Medic");
+                    }
+                    errorMessage.setText(String.valueOf(newMedic));
+                    if(nrMedici == 1){
+                        errorMessage.setText("Nu poti sterge singurul medic");
+                    }
+                    else{
+                        String deleteAcreditari = "DELETE FROM acreditarispeciale WHERE ID_Medic = " + medicID;
+                        String updatePacient = "UPDATE pacienti SET ID_Medic = " + newMedic + " WHERE ID_Medic = " + medicID;
+                        String deleteMedic = "DELETE FROM medic WHERE ID_Medic = " + medicID;
+                        String deleteAngajat = "DELETE FROM angajat WHERE ID_Angajat = " + angajatID;
+                        String deleteDonator = "DELETE FROM donatorisange WHERE ID_Utilizator = " + utilizatorID;
+                        String deleteUtilizator = "DELETE FROM utilizatori WHERE ID_Utilizator = " + utilizatorID;
+                        statement.execute(deleteAcreditari);
+                        statement.executeUpdate(updatePacient);
+                        statement.execute(deleteMedic);
+                        statement.execute(deleteAngajat);
+                        statement.execute(deleteDonator);
+                        statement.execute(deleteUtilizator);
+                        TableSuperAdmin.getItems().remove(selectedID.getSelectedIndex());
+                    }
+                }
+                else if(selectedUser.getFunctie().equals("Asistent Medical")){
+                    String getAsistentID = "SELECT Angajat.ID_Utilizator, ID_Angajat FROM Angajat, Utilizatori WHERE Utilizatori.ID_Utilizator = Angajat.ID_Utilizator AND Email = '" + selectedUser.getEmail() + "'";
+                    statement = connection.createStatement();
+                    resultSet = statement.executeQuery(getAsistentID);
+                    int angajatID = 0;
+                    int utilizatorID = 0;
+                    while(resultSet.next()){
+                        angajatID = resultSet.getInt("ID_Angajat");
+                        utilizatorID = resultSet.getInt("ID_Utilizator");
+                    }
+                    String deleteAsistent = "{CALL DeleteAsistent(?, ?)}";
+                    callableStatement = connection.prepareCall(deleteAsistent);
+                    callableStatement.setInt(1, utilizatorID);
+                    callableStatement.setInt(2, angajatID);
+                    callableStatement.execute();
+                    TableSuperAdmin.getItems().remove(selectedID.getSelectedIndex());
+                }
+                else {
+                    String getAngajatID = "SELECT Angajat.ID_Utilizator FROM Angajat, Utilizatori WHERE Utilizatori.ID_Utilizator = Angajat.ID_Utilizator AND Email = '" + selectedUser.getEmail() + "'";
+                    int utilizatorID = 0;
+                    statement = connection.createStatement();
+                    resultSet = statement.executeQuery(getAngajatID);
+                    while(resultSet.next()){
+                        utilizatorID = resultSet.getInt("ID_Utilizator");
+                    }
+                    String deleteAsistent = "{CALL DeleteAngajat(?)}";
+                    callableStatement = connection.prepareCall(deleteAsistent);
+                    callableStatement.setInt(1, utilizatorID);
+                    callableStatement.execute();
+                    TableSuperAdmin.getItems().remove(selectedID.getSelectedIndex());
+                }
             }
             else{
-                ResultSet resultSet;
-                int userPolyclinicID;
-                int userID;
+                errorMessage.setText("Selecteaza un utilizator");
+            }
+        }catch (Exception ex){
+            System.err.println("An SQL Exception occured. Details are provided below:");
+            ex.printStackTrace(System.err);
+        }
+        finally {
+            closeOperation(connection);
+            closeOperation(preparedStatement);
+            closeOperation(statement);
+            closeOperation(resultSet);
+        }
+    }
+    public void updateUser(ActionEvent e){
+        Connection connection = null;
+        DatabaseConnection connectionNow = new DatabaseConnection();
+        connection = connectionNow.getConnection();
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try{
+            TableView.TableViewSelectionModel<UsersSA> selectedID = TableSuperAdmin.getSelectionModel();
+            UsersSA selectedUser = selectedID.getSelectedItem();
+
+            if(selectedUser != null){
+                String verifySuperAdminPolyclinicID = "SELECT * FROM Utilizatori WHERE Email = '" + UserData.getEmail() + "'";
+                String verifyUserPolyclinicID = "SELECT * FROM Utilizatori WHERE Email = '" + selectedUser.getEmail() + "'";
                 int superAdminPolyclinicID = 0;
+                int userPolyclinicID = 0;
+
                 statement = connection.createStatement();
-                statement.execute(verifySuperAdminPolyclinicID);
                 resultSet = statement.executeQuery(verifySuperAdminPolyclinicID);
                 while(resultSet.next()){
                     superAdminPolyclinicID = resultSet.getInt("ID_Policlinici");
                 }
 
-                preparedStatement = connection.prepareStatement(verifyPolyclinicID);
-                preparedStatement.setString(1, selectedUser.getEmail());
-                resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
+                statement = connection.createStatement();
+                resultSet = statement.executeQuery(verifyUserPolyclinicID);
+                while(resultSet.next()){
                     userPolyclinicID = resultSet.getInt("ID_Policlinici");
-                    userID = resultSet.getInt("ID_Utilizator");
-                    if(superAdminPolyclinicID == userPolyclinicID){
-                        TableSuperAdmin.getItems().remove(selectedID.getSelectedIndex());
-                        preparedStatement = connection.prepareStatement(userToDelete);
-                        preparedStatement.setInt(1, userID);
-                        preparedStatement.execute();
-                        updateTable();
+                }
+
+                if(superAdminPolyclinicID == userPolyclinicID){
+                    if(!selectedUser.getFunctie().equals("Super Admin")){
+                        errorMessage.setText("");
+                        UserToUpdate.setEmail(selectedUser.getEmail());
+                        FXMLLoader fxmlLoader = new FXMLLoader(SuperAdminController.class.getResource("UpdateUserSuperAdmin.fxml"));
+                        Scene scene = new Scene(fxmlLoader.load(), 410, 670);
+                        Stage stageUSA = new Stage();
+                        stageUSA.setScene(scene);
+                        stageUSA.show();
                     }
                     else{
-                        FXMLLoader fxmlLoader = new FXMLLoader(SuperAdminController.class.getResource("DifferentPolyclinic.fxml"));
-                        Scene scene = new Scene(fxmlLoader.load(), 400, 320);
-                        Stage stageEDP = new Stage();
-                        stageEDP.setScene(scene);
-                        stageEDP.show();
+                        errorMessage.setText("Nu poti modifica un Super Admin");
                     }
                 }
+                else{
+                    errorMessage.setText("Nu poti modifica un utilizator de la o alta policlinica");
+                }
             }
-
+            else{
+                errorMessage.setText("Selecteaza un utilizator");
+            }
         }catch (Exception ex){
-            System.err.println("An SQL Exception occured. Details are provided below:");
-            ex.printStackTrace(System.err);
+            ex.printStackTrace();
+        }
+        finally {
+            closeOperation(connection);
+            closeOperation(statement);
+            closeOperation(resultSet);
+        }
+    }
+
+    @FXML
+    public void refreshTable(ActionEvent e){
+        list.clear();
+        updateTable();
+    }
+
+    public void closeOperation(AutoCloseable operation){
+        try {
+            if (operation != null) {
+                operation.close();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

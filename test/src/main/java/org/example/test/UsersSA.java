@@ -9,8 +9,9 @@ public class UsersSA {
     private String CNP;
     private String IBAN;
     private String functie;
+    private String policlinica;
 
-    public UsersSA(String nume, String prenume, String email, String adresa, String numarTelefon, String CNP, String IBAN, String functie) {
+    public UsersSA(String nume, String prenume, String email, String adresa, String numarTelefon, String CNP, String IBAN, String functie, String policlinica) {
         this.nume = nume;
         this.prenume = prenume;
         this.email = email;
@@ -19,6 +20,7 @@ public class UsersSA {
         this.CNP = CNP;
         this.IBAN = IBAN;
         this.functie = functie;
+        this.policlinica = policlinica;
     }
 
     public String getNume() {
@@ -83,5 +85,13 @@ public class UsersSA {
 
     public void setFunctie(String functie) {
         this.functie = functie;
+    }
+
+    public String getPoliclinica() {
+        return policlinica;
+    }
+
+    public void setPoliclinica(String policlinica) {
+        this.policlinica = policlinica;
     }
 }

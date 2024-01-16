@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="320.0" prefWidth="400.0" style="-fx-background-color: #db5757;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.test.DeleteSuperAdminController">
+<AnchorPane prefHeight="320.0" prefWidth="400.0" style="-fx-background-color: #db5757;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.test.DeleteSuperAdminErrorController">
    <children>
       <Label layoutX="24.0" layoutY="124.0" text="Nu poti sterge un Super Admin" textAlignment="CENTER" textFill="WHITE">
          <font>

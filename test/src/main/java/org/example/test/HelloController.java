@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
@@ -16,15 +17,20 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.*;
+import java.util.ResourceBundle;
 
-public class HelloController{
+public class HelloController {
     @FXML
     private Label logInMessageLabel;
+
     @FXML
     private TextField emailField;
+
     @FXML
     private PasswordField passwordField;
+
     @FXML
     protected void logInButtonOnAction(ActionEvent e) {
         if(!emailField.getText().isBlank() && !passwordField.getText().isBlank()){
@@ -34,71 +40,99 @@ public class HelloController{
             logInMessageLabel.setText("Please enter email and password");
         }
     }
+
+    @FXML
+    protected void signUpButtonAction(ActionEvent e) {
+        try {
+            Parent root;
+            FXMLLoader loader;
+            Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+            loader = new FXMLLoader(HelloController.class.getResource("CreateAccount.fxml"));
+            root = loader.load();
+            stage.setScene(new Scene(root, 870, 820));
+            stage.show();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
     public void validateLogIn(ActionEvent e){
         Connection connection = null;
         Statement selectStatement = null;
-        ResultSet rs = null;
-
+        ResultSet resultSet = null;
+        Boolean hasResult = false;
         DatabaseConnection connectNow = new DatabaseConnection();
         connection = connectNow.getConnection();
+        CallableStatement callableStatement;
 
         String enteredPassword = passwordField.getText();
-        String verifyLogin = "SELECT * FROM utilizatori WHERE Email = '" + emailField.getText() + "' AND Nume = '" + passwordField.getText() + "'";
+        String verifyLogin = "{call Autentificare(?, ?)}";
 
         try{
+            callableStatement = connection.prepareCall(verifyLogin);
+            callableStatement.setString(1, emailField.getText());
+            callableStatement.setString(2, passwordField.getText());
+            hasResult = callableStatement.execute();
 
-            selectStatement = connection.createStatement();
-            rs = selectStatement.executeQuery(verifyLogin);
-            if(rs.next()){
-                String databasePassword = rs.getString("Nume");
-                if(enteredPassword.equals(databasePassword)){
-                    String functie = rs.getString("Functie");
-                    Parent root;
-                    FXMLLoader loader;
-                    Stage stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+            if(hasResult){
+                resultSet = callableStatement.getResultSet();
+                while (resultSet.next()){
+                    String databasePassword = resultSet.getString("Parola");
+                    if(enteredPassword.equals(databasePassword)){
+                        String functie = resultSet.getString("Functie");
+                        Parent root;
+                        FXMLLoader loader;
+                        Stage stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
 
-                    UserData.setEmail(emailField.getText());
-                    UserData.setPassword(passwordField.getText());
+                        UserData.setEmail(emailField.getText());
+                        UserData.setPassword(passwordField.getText());
 
-                    if(functie.equals("Medic")){
-                        loader = new FXMLLoader(HelloController.class.getResource("Medic.fxml"));
-                        root = loader.load();
+                        if(functie.equals("Medic")){
+                            loader = new FXMLLoader(HelloController.class.getResource("Medic.fxml"));
+                            root = loader.load();
+                        }
+                        else if(functie.equals("Asistent Medical")){
+                            loader = new FXMLLoader(HelloController.class.getResource("AsistentMedical.fxml"));
+                            root = loader.load();
+                        }
+                        else if(functie.equals("Receptioner")){
+                            loader = new FXMLLoader(HelloController.class.getResource("Receptioner.fxml"));
+                            root = loader.load();
+                        }
+                        else if(functie.equals("Expert Financiar Contabil")){
+                            loader = new FXMLLoader(HelloController.class.getResource("ExpertFinanciarContabil.fxml"));
+                            root = loader.load();
+                        }
+                        else if(functie.equals("Inspector Resurse Umane")){
+                            loader = new FXMLLoader(HelloController.class.getResource("ResurseUmane.fxml"));
+                            root = loader.load();
+                        }
+                        else if(functie.equals("Admin")){
+                            loader = new FXMLLoader(HelloController.class.getResource("Admin.fxml"));
+                            root = loader.load();
+                        }
+                        else if(functie.equals("Super Admin")){
+                            loader = new FXMLLoader(HelloController.class.getResource("SuperAdmin.fxml"));
+                            root = loader.load();
+                        }
+                        else {
+                            loader = new FXMLLoader(HelloController.class.getResource("Pacient.fxml"));
+                            root = loader.load();
+                        }
+                        if(functie.equals("Medic")){
+                            stage.setScene(new Scene(root, 1000, 744));
+                            stage.show();
+                        }
+                        else{
+                            stage.setScene(new Scene(root, 1000, 700));
+                            stage.show();
+                        }
                     }
-                    else if(functie.equals("AsistentMedical")){
-                        loader = new FXMLLoader(HelloController.class.getResource("AsistentMedical.fxml"));
-                        root = loader.load();
+                    else{
+                        logInMessageLabel.setText("Invalid email or password");
                     }
-                    else if(functie.equals("Receptioner")){
-                        loader = new FXMLLoader(HelloController.class.getResource("Receptioner.fxml"));
-                        root = loader.load();
-                    }
-                    else if(functie.equals("Expert Financiar Contabil")){
-                        loader = new FXMLLoader(HelloController.class.getResource("ExpertFinanciarContabil.fxml"));
-                        root = loader.load();
-                    }
-                    else if(functie.equals("Inspector Resurse Umane")){
-                        loader = new FXMLLoader(HelloController.class.getResource("ResurseUmane.fxml"));
-                        root = loader.load();
-                    }
-                    else if(functie.equals("Admin")){
-                        loader = new FXMLLoader(HelloController.class.getResource("Admin.fxml"));
-                        root = loader.load();
-                    }
-                    else if(functie.equals("Super Admin")){
-                        loader = new FXMLLoader(HelloController.class.getResource("SuperAdmin.fxml"));
-                        root = loader.load();
-                    }
-                    else {
-                        loader = new FXMLLoader(HelloController.class.getResource("Pacient.fxml"));
-                        root = loader.load();
-                    }
-
-                    stage.setScene(new Scene(root, 1000, 700));
-                    stage.show();
                 }
-                else{
-                    logInMessageLabel.setText("Invalid email or password");
-                }
+
             }
             else{
                 logInMessageLabel.setText("Invalid email or password");
@@ -108,30 +142,12 @@ public class HelloController{
             sqlex.printStackTrace(System.err);
         }
         finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                }
-                catch(SQLException ex) {
-                }
-                rs = null;
-            }
-            if (selectStatement != null) {
-                try {
-                    selectStatement.close();
-                }
-                catch(SQLException ex) {}
-                selectStatement = null;
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                }
-                catch(SQLException ex) {}
-                connection = null;
-            }
+            closeOperation(connection);
+            closeOperation(selectStatement);
+            closeOperation(resultSet);
         }
     }
+
     public static void logOutButtonAction(ActionEvent e, Class<?> controllerClass) {
         try {
             Parent root;
@@ -146,4 +162,14 @@ public class HelloController{
             ex.printStackTrace();
         }
     }
+    public void closeOperation(AutoCloseable operation){
+        try {
+            if (operation != null) {
+                operation.close();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

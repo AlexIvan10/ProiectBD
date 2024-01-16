@@ -20,6 +20,51 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Label>
+            <Label layoutX="144.0" layoutY="257.0" text="Nume" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="127.0" layoutY="305.0" text="Prenume" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="79.0" layoutY="354.0" text="Ore de lucru pe zi" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="139.0" layoutY="407.0" text="Salariu" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="numeContabilFld" layoutX="343.0" layoutY="257.0" prefHeight="35.0" prefWidth="391.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="prenumeContabilFld" layoutX="343.0" layoutY="305.0" prefHeight="35.0" prefWidth="391.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="oreContabilFld" layoutX="343.0" layoutY="354.0" prefHeight="35.0" prefWidth="391.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="salariuContabil" layoutX="343.0" layoutY="407.0" prefHeight="35.0" prefWidth="391.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Button layoutX="379.0" layoutY="150.0" mnemonicParsing="false" onAction="#operatiiContabileButtonAction" prefHeight="52.0" prefWidth="239.0" style="-fx-background-color: #b42727;" text="Operatii contabile" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
    </center>

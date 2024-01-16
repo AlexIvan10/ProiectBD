@@ -20,6 +20,51 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Label>
+            <Button layoutX="360.0" layoutY="141.0" mnemonicParsing="false" onAction="#gestiuneaActivitatilorButtonAction" style="-fx-background-color: #b42727;" text="Gestiunea activitatilor" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Button>
+            <Label layoutX="120.0" layoutY="260.0" text="Nume" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="103.0" layoutY="309.0" text="Prenume" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="55.0" layoutY="358.0" text="Ore de lucru pe zi" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="115.0" layoutY="405.0" text="Salariu" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="numeReceptionerFld" layoutX="329.0" layoutY="260.0" prefHeight="35.0" prefWidth="414.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="prenumeReceptionerFld" layoutX="329.0" layoutY="309.0" prefHeight="35.0" prefWidth="414.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="oreReceptionerFld" layoutX="329.0" layoutY="358.0" prefHeight="35.0" prefWidth="414.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="salariuReceptionerFld" layoutX="329.0" layoutY="405.0" prefHeight="35.0" prefWidth="414.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </center>
